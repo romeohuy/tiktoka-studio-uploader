@@ -1,15 +1,10 @@
 include README.md
 include LICENSE
 
-include upgenius/requirements.txt
-include upgenius/VERSION
+include tsup/requirements.txt
+include tsup/VERSION
 
-
-include upgenius/tiktok/selenium/config.toml
-include upgenius/tiktok/selenium/proxy_auth_extension/background.js
-include upgenius/tiktok/selenium/proxy_auth_extension/manifest.json
-
-recursive-include upgenius/utils/js *
+recursive-include tsup/utils/js *
 recursive-include tests *
 
 global-exclude __pycache__ *.py[cod]

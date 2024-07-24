@@ -1,11 +1,12 @@
-**Update 2023-12-06**
+**Update 2023-09-17**
 
-1.rename package to upload pypi for easy install  due to old tsup is not allowed to use anymore
+1. add batch file process for tiktok 
 
+python examples/batch_files_in_excel_tiktok.py
 
+python examples/batch_files_in_json_youtube.py
 
-
-
+2. fix other issues
 
 
 ## USAGE
@@ -13,14 +14,8 @@
 if there's anything you don't understand, submit an issue or cantact me
 
 ### for those beginner
-checkout the [GUI version V2](https://github.com/wanghaisheng/tiktoka-studio-uploader-app).
 
-
-checkout the [GUI version V1](https://github.com/wanghaisheng/uploader-genius-V1).
-
-New version you can check www.tiktokastudio.com for more infos.
-
-I can also assist you to run script in your own server(Paid)
+checkout the [GUI version](https://github.com/wanghaisheng/tiktoka-studio-uploader-app).
 
 ### youtube
 
@@ -36,7 +31,7 @@ check [how to upload tiktok videos](./how-to-upload-tiktok.md)
 [![Tiktoka Studio Uploader](https://raw.githubusercontent.com/wanghaisheng/youtube-auto-upload/master/assets/images.png)](#readme)
 
 [![Release version](https://img.shields.io/github/v/release/wanghaisheng/youtube-auto-upload?color=brightgreen&label=Download&style=for-the-badge)](#release-files "Release")
-[![PyPi](https://img.shields.io/badge/-PyPi-blue.svg?logo=pypi&labelColor=555555&style=for-the-badge)](https://pypi.org/project/upgenius "PyPi")
+[![PyPi](https://img.shields.io/badge/-PyPi-blue.svg?logo=pypi&labelColor=555555&style=for-the-badge)](https://pypi.org/project/ytb-up "PyPi")
 [![Donate](https://img.shields.io/badge/_-Donate-red.svg?logo=githubsponsors&labelColor=555555&style=for-the-badge)](https://github.com/sponsors/wanghaisheng "Donate")
 [![Sponsors](https://img.shields.io/github/sponsors/wanghaisheng)]("Sponsors")
 
@@ -56,7 +51,7 @@ Last Year During COVID I was shutdown at home without walking out the door for 2
 
 ---
 
-This project aims to automate the Videos upload process for social media platform such as YouTube . Since videos can only be publicly uploaded through the YouTube Data API by using a Google Workspaces Account (not free!YouTube counts 1600 credits per upload. ), I decided to figure out a headless uploader using Selenium and Playwright. This approach also bypasses API restrictions (e.g. Rate Limits/Endcards can't be set through the API).There are tons of library existing but not for me .
+This project aims to automate the upload process for YouTube Videos. Since videos can only be publicly uploaded through the YouTube Data API by using a Google Workspaces Account (not free!YouTube counts 1600 credits per upload. ), I decided to figure out a headless uploader using Selenium and Playwright. This approach also bypasses API restrictions (e.g. Rate Limits/Endcards can't be set through the API).There are tons of library existing but not for me .
 
 AS a code dummy, I do accept any advice because my only purpose is to get things working
 
@@ -86,11 +81,6 @@ AS a code dummy, I do accept any advice because my only purpose is to get things
 
 
 ## features YOU MAY NEED
-
-### profile support
-
-use firefox profile instead of cookie file can  avoid hints such as your browser is insecure
-
 
 ### 1. proxy support
 
@@ -221,10 +211,6 @@ https://github.com/wanghaisheng/tiktoka-studio-uploader/blob/playwright/supporte
 you can submit an issue too
 
 ## community/Support
-
-Join discord
-
-https://discord.gg/mSCMS3jv5V
 
 Join lark for debugging your issues with me
 

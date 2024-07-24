@@ -5,19 +5,19 @@ from playwright.async_api import (
     async_playwright,
     expect,
 )
-from upgenius.utils.webdriver.playwright_driver_async_stealth import (
+from tsup.utils.webdriver.playwright_driver_async_stealth import (
     PlaywrightAsyncDriverStealth,
 )
-from upgenius.utils.webdriver.playwright_driver_async_undetected import (
+from tsup.utils.webdriver.playwright_driver_async_undetected import (
     PlaywrightAsyncDriverUndetected,
 )
 
-from upgenius.utils.webdriver.playwright_driver_async import (
+from tsup.utils.webdriver.playwright_driver_async import (
     PlaywrightAsyncDriver,
 )
 import asyncio
 import os
-from upgenius.botright.botright import Botright
+from tsup.botright.botright import Botright
 from cf_clearance import async_cf_retry, async_stealth
 from datetime import datetime
 from urllib.parse import urlparse, urlunsplit, urlsplit
@@ -99,7 +99,7 @@ class Botcheck:
             #     {"x": 0, "y": 0, "xDistance": 0, "yDistance": -100},
             # )
             await self.page.dispatch_event("input#test-input", "scroll")
-            # await self.page.wait_for_timeout(2500)
+            await self.page.wait_for_timeout(2500)
             await expect(self.page.locator("#result")).to_be_visible()
             element = self.page.locator("#result")
             output = await element.get_attribute("textContent")
@@ -309,7 +309,7 @@ class Botcheck:
             if button:
                 await button.click(delay=10)
                 await self.page.waitForNavigation(wait_until="networkidle2")
-                # await self.page.wait_for_timeout(500)
+                await self.page.wait_for_timeout(500)
             else:
                 print("Could not find the button!")
 
@@ -338,7 +338,7 @@ class Botcheck:
             if button:
                 await button.click(delay=8)
                 await self.page.waitForNavigation(wait_until="networkidle2")
-                # await self.page.wait_for_timeout(500)
+                await self.page.wait_for_timeout(500)
             else:
                 print("Could not find the button!")
 
@@ -523,14 +523,14 @@ async def main():
             use_stealth_js=False,
     #         for github action
             headless=False,
-
+            
         )
-        freshpage=pl.page
+        freshpage=pl.page        
         await pl.page.goto(url)
-        await pl.page.screenshot(path=f"result/{url.split('//')[-1]}.png", full_page=True)
+        await pl.page.screenshot(path=f"result/{url.split('//')[-1]}.png", full_page=True)        
         print('PlaywrightAsyncDriverUndetected raw pl',url)
-
-        botcheck = Botcheck(freshpage)
+        
+        botcheck = Botcheck(freshpage)    
         await pl.quit()
     for url in ipchecklist:
 
@@ -541,13 +541,13 @@ async def main():
             use_stealth_js=False,
     #         for github action
             headless=True,
-
+            
         )
-        freshpage=pl.page
+        freshpage=pl.page        
         print('raw pl',url)
-
+        
         botcheck = Botcheck(freshpage)
-
+        
         await botcheck.checkIP(botcheck.page ,url)
     for url in ipchecklist:
 
@@ -558,12 +558,12 @@ async def main():
             use_stealth_js=True,
     #         for github action
             headless=True,
-
+            
         )
-        freshpage=pl.page
+        freshpage=pl.page       
         print('raw pl with stealth js',url)
 
-        await botcheck.checkIP(pl.page ,url)
+        await botcheck.checkIP(pl.page ,url)        
     for url in ipchecklist:
         print('raw pl with async_stealth',url)
         pl = await PlaywrightAsyncDriverStealth.create(
@@ -573,9 +573,9 @@ async def main():
     #         headless=False,
     #         for github action
             headless=True,
-
+            
         )
-        freshpage=pl.page
+        freshpage=pl.page     
         botcheck = Botcheck(freshpage)
         await async_stealth(botcheck.page, pure=True)
         await botcheck.checkIP(botcheck.page ,url)
@@ -589,11 +589,11 @@ async def main():
             use_stealth_js=False,
     #         for github action
             headless=True,
-
+            
         )
-        freshpage=pl.page
-
-        botcheck = Botcheck(freshpage)
+        freshpage=pl.page        
+        
+        botcheck = Botcheck(freshpage)        
         print('raw pl with navigator',url)
 
         await pl.page.add_init_script(
