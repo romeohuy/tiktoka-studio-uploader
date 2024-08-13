@@ -1,4 +1,4 @@
-from tsup.tiktok.sessionId.uploader import  upload2TiktokSessionId
+from tsup.tiktok.sessionId.uploader import  upload2NewTiktokSessionId, upload2TiktokSessionId
 from tsup.utils.tools import get_duration_timestamp
 from flask import Flask, url_for ,render_template
 from flask import request
@@ -70,7 +70,8 @@ def upload_video():
     #file = json.get('file')
     title = random.choice(nature_titles) #request.form.get('title')
     tags = random.sample(nature_hashtags, num_tag)
-    result = upload2TiktokSessionId(sessionid, file, title, tags)
+    result = upload2NewTiktokSessionId(sessionid, file, title, tags)
+    print(str(result))
     print(title)
     return str(result)
     #return str(uploadVideo(session_id, file, title, tags, verbose=True))

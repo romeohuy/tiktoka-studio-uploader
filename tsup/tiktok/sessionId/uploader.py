@@ -8,7 +8,7 @@ from tsup.tiktok.sessionId.util import assertSuccess, printError, getTagsExtra, 
 import urllib3
 requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = 'ALL:@SECLEVEL=1'
 
-UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0'
 
 
 def upload2TiktokSessionId(session_id, video, title, tags, users=[], url_prefix="www", schedule_time: int = 0, proxy: dict = None):
@@ -112,6 +112,7 @@ def upload2TiktokSessionId(session_id, video, title, tags, users=[], url_prefix=
 		return False
 	if r.json()["status_code"] == 0:
 		log(f"Published successfully {'| Scheduled for ' + str(schedule_time) if schedule_time else ''}")
+		return r.json()["info"]["tasks"][0]["item_id"]
 	else:
 		log("Publish failed")
 		printError(url, r)
@@ -119,6 +120,117 @@ def upload2TiktokSessionId(session_id, video, title, tags, users=[], url_prefix=
 
 	return True
 
+
+def upload2NewTiktokSessionId(session_id, video, title, tags, users=[], url_prefix="www", schedule_time: int = 0, proxy: dict = None):
+	if schedule_time - datetime.datetime.now().timestamp() > 864000:  # 864000s = 10 days
+		print("[-] Can not schedule video in more than 10 days")
+		return False
+
+	session = requests.Session()
+
+	if proxy:
+		session.proxies.update(proxy)
+	session.cookies.set("sessionid", session_id, domain=".tiktok.com")
+	session.verify = True
+	print(f'session proxy:{session.proxies}')
+	headers = {
+		'User-Agent': UA
+	}
+	url = f"https://{url_prefix}.tiktok.com/upload/"
+	r = session.get(url, headers=headers)
+	if not assertSuccess(url, r):
+		return False
+	creationid = getCreationId()
+	url = f"https://{url_prefix}.tiktok.com/api/v1/web/project/create/?creation_id={creationid}&type=1&aid=1988"
+	headers = {
+		"X-Secsdk-Csrf-Request": "1",
+		"X-Secsdk-Csrf-Version": "1.2.8"
+	}
+	r = session.post(url, headers=headers)
+	if not assertSuccess(url, r):
+		return False
+	try:
+		tempInfo = r.json()['project']
+	except KeyError:
+		print(f"[-] An error occured while reaching {url}")
+		print("[-] Please try to change the --url_server argument to the adapted prefix for your account")
+		return False
+	creationID = tempInfo["creationID"]
+	projectID = tempInfo["project_id"]
+	# 获取账号信息
+	url = f"https://{url_prefix}.tiktok.com/passport/web/account/info/"
+	r = session.get(url)
+	if not assertSuccess(url, r):
+		return False
+	# user_id = r.json()["data"]["user_id_str"]
+	log("Start uploading video")
+	video_id = uploadToTikTok(video, session)
+	if not video_id:
+		log("Video upload failed")
+		return False
+	log("Video uploaded successfully")
+	time.sleep(2)
+	result = getTagsExtra(title, tags, users, session, url_prefix)
+	time.sleep(3)
+	title = result[0]
+	text_extra = result[1]
+	postQuery = {
+		'app_name': 'tiktok_web',
+		'channel': 'tiktok_web',
+		'device_platform': 'web',
+		'aid': 1988
+	}
+	data = {
+		"creation_id": creationID,
+		"items": [
+			{
+				"fileKey": "file_1723521317308_400182",
+				"video_id": video_id,
+				"poster_delay": 0,
+				"visibility_type": 0,
+				"allow_duet": 0,
+				"allow_stitch": 0,
+				"allow_comment": 1,
+				"text": title,
+				"text_extra": text_extra,
+				"markup_text": "",
+				"sound_exemption": 0,
+				"geofencing_regions": [],
+				"is_long_video": 0,
+				"tcm_params": "{\"commerce_toggle_info\":{}}",
+				"aigc_info": {
+					"aigc_label_type": 0
+				},
+				"enter_post_page_from": 2,
+				"content_check_id": ""
+			}
+		]
+	}
+	if schedule_time and schedule_time - datetime.datetime.now().timestamp() > 900:  # 900s = 15min
+		data["upload_param"]["schedule_time"] = schedule_time
+	postQuery['X-Bogus'] = get_x_bogus(urlencode(postQuery), json.dumps(data, separators=(',', ':')), UA)
+	url = f'https://{url_prefix}.tiktok.com/api/v1/item/create/bulk/'
+	headers = {
+		'Host': f'{url_prefix}.tiktok.com',
+		'content-type': 'application/json',
+		'user-agent': UA,
+		'origin': 'https://www.tiktok.com',
+		'referer': 'https://www.tiktok.com/'
+	}
+	r = session.post(url, params=postQuery, data=json.dumps(data, separators=(',', ':')), headers=headers)
+	if not assertSuccess(url, r):
+		log("Publish failed")
+		printError(url, r)
+		return False
+	if r.json()["status_code"] == 0:
+		log(f"Published successfully {'| Scheduled for ' + str(schedule_time) if schedule_time else ''}")
+		return r.json()["items"][0]["item_id"]
+	else:
+		log("Publish failed")
+		printError(url, r)
+		return False
+
+	return True
 
 if __name__ == "__main__":
 	import argparse
@@ -133,4 +245,4 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	# python3 ./uploader.py -i 'your sessionid' -p ./download/test.mp4 -t  测试上传
 	# uploadVideo('your sessionid', './download/test.mp4', '就问你批不批', ['热门'],[])
-	uploadVideo(args.session_id, args.path, args.title, args.tags, args.users, args.url_server, args.schedule_time)
+	#uploadVideo(args.session_id, args.path, args.title, args.tags, args.users, args.url_server, args.schedule_time)
